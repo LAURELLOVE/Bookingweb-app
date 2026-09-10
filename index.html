@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fernwood Studio — Booking App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F2EFE6; --surface:#FBFAF5; --surface-2:#EAE5D7;
+    --ink:#1C2430; --ink-soft:#5A6270;
+    --accent:#B96A21; --accent-soft:#E9C79A;
+    --teal:#3D6F65; --teal-soft:#CFE0DA;
+    --line:#DAD3C0; --line-strong:#C7BEA6; --radius:6px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:"IBM Plex Sans",sans-serif;}
+  h1,h2,h3{font-family:"Fraunces",serif; font-weight:500; margin:0;}
+  .mono{font-family:"IBM Plex Mono",monospace;}
+  .banner{background:var(--ink); color:var(--bg); padding:10px 20px; font-family:"IBM Plex Mono",monospace; font-size:.78rem; text-align:center;}
+  .banner b{color:var(--accent-soft);}
+  .wrap{max-width:760px; margin:0 auto; padding:40px 24px;}
+  header.top{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px;}
+  header.top h1{font-size:1.6rem;}
+  .sub{color:var(--ink-soft); font-size:.9rem; margin-bottom:32px;}
+
+  .steps{display:flex; gap:8px; margin-bottom:30px; font-family:"IBM Plex Mono",monospace; font-size:.75rem;}
+  .step{padding:6px 12px; border-radius:999px; border:1px solid var(--line-strong); color:var(--ink-soft);}
+  .step.on{background:var(--ink); color:var(--bg); border-color:var(--ink);}
+
+  .panel{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:26px;}
+
+  .cal-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;}
+  .cal-head button{background:none; border:1px solid var(--line-strong); border-radius:4px; width:30px; height:30px; cursor:pointer; color:var(--ink);}
+  .cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:6px;}
+  .cal-grid .dow{font-size:.7rem; color:var(--ink-soft); text-align:center; font-family:"IBM Plex Mono",monospace;}
+  .day{aspect-ratio:1; display:flex; align-items:center; justify-content:center; border-radius:6px; font-size:.86rem; cursor:pointer; border:1px solid transparent;}
+  .day.avail{background:var(--teal-soft); color:var(--teal);}
+  .day.avail:hover{border-color:var(--teal);}
+  .day.off{color:var(--line-strong);}
+  .day.sel{background:var(--accent); color:#fff;}
+
+  .slots{margin-top:22px; display:none;}
+  .slots.show{display:block;}
+  .slot-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:12px;}
+  .slot{padding:10px; text-align:center; border:1px solid var(--line-strong); border-radius:6px; font-family:"IBM Plex Mono",monospace; font-size:.82rem; cursor:pointer;}
+  .slot.sel{background:var(--ink); color:var(--bg); border-color:var(--ink);}
+
+  .form-view, .confirm-view{display:none;}
+  .form-view.show, .confirm-view.show{display:block;}
+  .field{margin-bottom:16px;}
+  .field label{display:block; font-size:.8rem; color:var(--ink-soft); margin-bottom:6px;}
+  .field input, .field select{width:100%; padding:10px 12px; border:1px solid var(--line-strong); border-radius:6px; font-family:"IBM Plex Sans",sans-serif; font-size:.9rem; background:var(--bg); color:var(--ink);}
+  .btn{background:var(--accent); color:#fff; border:none; padding:12px 22px; border-radius:6px; font-size:.9rem; cursor:pointer;}
+  .btn.ghost{background:transparent; border:1px solid var(--line-strong); color:var(--ink);}
+  .btnrow{display:flex; gap:10px; margin-top:20px;}
+
+  .confirm-view{text-align:center; padding:20px 0;}
+  .check{width:56px; height:56px; border-radius:50%; background:var(--teal-soft); display:flex; align-items:center; justify-content:center; margin:0 auto 16px;}
+  .summary{background:var(--surface-2); border-radius:6px; padding:16px; margin:20px 0; font-size:.88rem; text-align:left;}
+  .summary div{display:flex; justify-content:space-between; padding:5px 0;}
+  .summary .k{color:var(--ink-soft);}
+
+  .note{margin-top:26px; background:var(--surface-2); border:1px solid var(--line); border-radius:var(--radius); padding:16px 20px; font-size:.85rem; color:var(--ink-soft);}
+  .note b{color:var(--ink); font-family:"IBM Plex Mono",monospace; font-size:.7rem; text-transform:uppercase; letter-spacing:.06em; display:block; margin-bottom:4px;}
+  footer{text-align:center; padding:10px 0 30px; font-size:.8rem; color:var(--ink-soft);}
+</style>
+</head>
+<body>
+
+<div class="banner">Sample project — a working booking-flow demo, not a live studio. <b>Built by Tambe Egbe Laura</b></div>
+
+<div class="wrap">
+  <header class="top"><h1>Fernwood Studio</h1></header>
+  <div class="sub">Book a 1:1 pottery wheel session</div>
+
+  <div class="steps">
+    <div class="step on" id="s1">1 · Date &amp; time</div>
+    <div class="step" id="s2">2 · Your details</div>
+    <div class="step" id="s3">3 · Confirmed</div>
+  </div>
+
+  <div class="panel">
+    <!-- Step 1 -->
+    <div id="view1">
+      <div class="cal-head">
+        <button onclick="alert('Demo shows October only')">‹</button>
+        <div class="mono">October 2026</div>
+        <button onclick="alert('Demo shows October only')">›</button>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+
+      <div class="slots" id="slotsBox">
+        <div class="mono" style="font-size:.8rem; color:var(--ink-soft);">Available times — <span id="selDateLbl"></span></div>
+        <div class="slot-grid" id="slotGrid"></div>
+      </div>
+
+      <div class="btnrow">
+        <button class="btn" id="toStep2" onclick="goStep(2)" disabled>Continue</button>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="form-view" id="view2">
+      <div class="field"><label>Full name</label><input type="text" placeholder="Your name" id="fName"></div>
+      <div class="field"><label>Email</label><input type="email" placeholder="you@email.com" id="fEmail"></div>
+      <div class="field"><label>Session type</label>
+        <select id="fType"><option>Beginner wheel session (90 min)</option><option>Studio member open session (2 hr)</option><option>Private glazing session (60 min)</option></select>
+      </div>
+      <div class="btnrow">
+        <button class="btn ghost" onclick="goStep(1)">Back</button>
+        <button class="btn" onclick="submitBooking()">Confirm booking</button>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="confirm-view" id="view3">
+      <div class="check">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M4 12l5 5L20 6" stroke="#3D6F65" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h2 style="font-size:1.4rem;">Booking confirmed</h2>
+      <div class="summary" id="summaryBox"></div>
+      <button class="btn ghost" onclick="location.reload()">Book another session</button>
+    </div>
+  </div>
+
+  <div class="note"><b>Build notes</b>Vanilla JS state machine — pick a day, pick a slot, fill the form, confirm. No backend: this demonstrates the interaction flow a real booking app would sit on top of (date/slot selection, validation, confirmation state).</div>
+</div>
+
+<footer>Sample project by Tambe Egbe Laura — <a href="../../portfolio/index.html">back to portfolio</a></footer>
+
+<script>
+  const availableDays = [3,5,6,10,12,13,17,19,20,24,26,27];
+  const cal = document.getElementById('calGrid');
+  ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(d => cal.innerHTML += `<div class="dow">${d}</div>`);
+  const firstDow = 4; // Oct 1 2026 is a Thursday
+  for (let i=0;i<firstDow;i++) cal.innerHTML += `<div></div>`;
+  for (let d=1; d<=31; d++){
+    const avail = availableDays.includes(d);
+    cal.innerHTML += `<div class="day ${avail?'avail':'off'}" ${avail?`onclick="pickDay(${d}, this)"`:''}>${d}</div>`;
+  }
+
+  let selectedDay = null, selectedSlot = null;
+  function pickDay(d, el){
+    document.querySelectorAll('.day').forEach(x => x.classList.remove('sel'));
+    el.classList.add('sel');
+    selectedDay = d;
+    selectedSlot = null;
+    document.getElementById('selDateLbl').textContent = `October ${d}, 2026`;
+    const slots = ['9:00 AM','11:00 AM','1:30 PM','3:00 PM','4:30 PM','6:00 PM'];
+    const sg = document.getElementById('slotGrid');
+    sg.innerHTML = '';
+    slots.forEach(s => { sg.innerHTML += `<div class="slot" onclick="pickSlot('${s}', this)">${s}</div>`; });
+    document.getElementById('slotsBox').classList.add('show');
+    document.getElementById('toStep2').disabled = true;
+  }
+  function pickSlot(s, el){
+    document.querySelectorAll('.slot').forEach(x => x.classList.remove('sel'));
+    el.classList.add('sel');
+    selectedSlot = s;
+    document.getElementById('toStep2').disabled = false;
+  }
+  function goStep(n){
+    document.getElementById('view1').style.display = n===1 ? 'block':'none';
+    document.getElementById('view2').classList.toggle('show', n===2);
+    document.getElementById('view3').classList.toggle('show', n===3);
+    document.getElementById('s1').classList.toggle('on', n>=1);
+    document.getElementById('s2').classList.toggle('on', n>=2);
+    document.getElementById('s3').classList.toggle('on', n>=3);
+  }
+  function submitBooking(){
+    const name = document.getElementById('fName').value || 'Guest';
+    const type = document.getElementById('fType').value;
+    document.getElementById('summaryBox').innerHTML = `
+      <div><span class="k">Name</span><span>${name}</span></div>
+      <div><span class="k">Session</span><span>${type}</span></div>
+      <div><span class="k">Date</span><span>October ${selectedDay}, 2026</span></div>
+      <div><span class="k">Time</span><span>${selectedSlot}</span></div>`;
+    goStep(3);
+  }
+</script>
+</body>
+</html>
